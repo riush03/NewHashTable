@@ -124,41 +124,25 @@ HashIndex hashBySum(AAKeyType key, size_t keyLength, HashIndex size)
  */
 HashIndex linearProbe(AssociativeArray *hashTable,
 		AAKeyType key, size_t keylength,
-		int index, int startIndex,int invalidEndsSearch, int *cost
+		int index, int invalidEndsSearch, int *cost
 	)
 {
-	/**
-	 * TO DO: you will need to implement an algorithm
-	 * that probes until it finds an "empty" slot in
-	 * the hashTable.  Note that because of tombstones,
-	 * there are multiple ways of a slot being empty.
-	 * Additionally, the code in HashTable depends on
-	 * this code to find an actually empty slot, so
-	 * this code is called with the results of the
-	 * hash -- this means that the "index" value may
-	 * already be valid on entry.
-	 *
-	 * Note that if an empty place cannot be found,
-	 * you are to return (-1).  If a zero or positive
-	 * value is returned, the calling code <i>will</i>
-	 * use it, so be sure your return values are correct!
-	 *
-	 * For this routine, implement a "linear" probing
-	 * strategy, such as that discussed in class.
-	 */
-	HashIndex index = startIndex;
-    while (1) {
-        if (hashTable->table[index].validity == HASH_EMPTY || (invalidEndsSearch && hashTable->table[index].validity != HASH_USED)) {
-            return index; // Found an empty or deleted slot
-        }
-        (*cost)++;
-        index = (index + 1) % hashTable->size; // Linear probing: move to the next slot
-        if (index == startIndex) {
-            return -1; // Search failed, the table is full
-        }
-    }
-}
+	int startIndex = index;  // Store the original index to detect a full table.
+	while (1) {
+		if (hashTable->table[index].validity == HASH_EMPTY || (invalidEndsSearch && hashTable->table[index].validity != HASH_USED)) {
+			return index;  // Found an empty or deleted slot.
+		}
 
+		(*cost)++;  // Increment the cost of probing.
+
+		index = (index + 1) % hashTable->size;  // Linear probing: move to the next slot.
+
+		// If we've returned to the original index, the table is full.
+		if (index == startIndex) {
+			return -1;  // Search failed, the table is full.
+		}
+	}
+}
 
 /**
  * Locate an empty position in the given array, starting the
@@ -181,39 +165,25 @@ HashIndex quadraticProbe(AssociativeArray *hashTable, AAKeyType key, size_t keyl
 		int *cost
 	)
 {
-	/**
-	 * TO DO: you will need to implement an algorithm
-	 * that probes until it finds an "empty" slot in
-	 * the hashTable.  Note that because of tombstones,
-	 * there are multiple ways of a slot being empty.
-	 * Additionally, the code in HashTable depends on
-	 * this code to find an actually empty slot, so
-	 * this code is called with the results of the
-	 * hash -- this means that the "index" value may
-	 * already be valid on entry.
-	 *
-	 * Note that if an empty place cannot be found,
-	 * you are to return (-1).  If a zero or positive
-	 * value is returned, the calling code <i>will</i>
-	 * use it, so be sure your return values are correct!
-	 *
-	 * For this routine, implement a "quadratic" probing
-	 * strategy, such as that discussed in class.
-	 */
-	HashIndex index = startIndex;
-    HashIndex step = 1;
-    while (1) {
-        if (hashTable->table[index].validity == HASH_EMPTY || (invalidEndsSearch && hashTable->table[index].validity != HASH_USED)) {
-            return index; // Found an empty or deleted slot
-        }
-        (*cost)++;
-        index = (startIndex + step * step) % hashTable->size; // Quadratic probing: move to the next slot
-        step++;
-        if (index == startIndex) {
-            return -1; // Search failed, the table is full
-        }
-    }
+	int index = startIndex;
+	int step = 1;
+	while (1) {
+		if (hashTable->table[index].validity == HASH_EMPTY || (invalidEndsSearch && hashTable->table[index].validity != HASH_USED)) {
+			return index;  // Found an empty or deleted slot.
+		}
+
+		(*cost)++;  // Increment the cost of probing.
+
+		index = (startIndex + step * step) % hashTable->size;  // Quadratic probing: move to the next slot.
+		step++;
+
+		// If we've returned to the original index, the table is full.
+		if (index == startIndex) {
+			return -1;  // Search failed, the table is full.
+		}
+	}
 }
+
 
 
 /**
