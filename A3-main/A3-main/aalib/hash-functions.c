@@ -202,33 +202,22 @@ HashIndex quadraticProbe(AssociativeArray *hashTable, AAKeyType key, size_t keyl
  *
  *  @see    HashProbe
  */
-HashIndex doubleHashProbe(AssociativeArray *hashTable, AAKeyType key, size_t keylen,
-		int startIndex, int invalidEndsSearch,
-		int *cost
-	)
+HashIndex doubleHashProbe(AssociativeArray *hashTable, AAKeyType key, size_t keylen, int startIndex, int invalidEndsSearch, int *cost)
 {
-	/**
-	 * TO DO: you will need to implement an algorithm
-	 * that calls a second hash function (listed
-	 * in the hashTable) and uses the value obtained
-	 * as a result from that as the step size.
-	 *
-	 * Beyond that, the algorithm proceeds as with
-	 * the above strategies.
-	 */
-	HashIndex index = startIndex;
+    HashIndex index = startIndex;
     HashIndex step = 1;
     while (1) {
         if (hashTable->table[index].validity == HASH_EMPTY || (invalidEndsSearch && hashTable->table[index].validity != HASH_USED)) {
             return index; // Found an empty or deleted slot
         }
         (*cost)++;
-        HashIndex stepSize = aarray->hashAlgorithmSecondary(key, keylen, aarray->size);
-        index = (index + stepSize * step) % aarray->size; // Double hashing: move to the next slot using a second hash
+        HashIndex stepSize = hashTable->hashAlgorithmSecondary(key, keylen, hashTable->size);
+        index = (index + stepSize * step) % hashTable->size; // Double hashing: move to the next slot using a second hash
         step++;
         if (index == startIndex) {
             return -1; // Search failed, the table is full
         }
     }
 }
+
 
